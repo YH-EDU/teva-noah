@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>תיבת נח · ימות המבול</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Frank+Ruhl+Libre:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1b1712;
+      --sea: #0c1c2c;
+      --sea-2: #14324a;
+      --gold: #e2b15a;
+      --gold-2: #a8742e;
+      --parchment: #f7f1e4;
+      --parchment-2: #efe4cf;
+      --line: rgba(255, 248, 235, 0.14);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      color: var(--parchment);
+      background:
+        radial-gradient(1200px 500px at 100% -10%, rgba(226, 177, 90, 0.16), transparent 55%),
+        linear-gradient(180deg, #102536 0%, var(--sea) 40%, #08141f 100%);
+      font-family: Assistant, "Segoe UI", Arial, sans-serif;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 18px 4px;
+    }
+    header h1 {
+      margin: 0;
+      font-family: "Frank Ruhl Libre", David, "Times New Roman", serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    header p { margin: 2px 0 0; color: rgba(247, 241, 228, 0.72); font-size: 0.92rem; }
+    .readout {
+      text-align: left;
+      min-width: 220px;
+    }
+    .readout .date {
+      font-family: "Frank Ruhl Libre", David, serif;
+      font-size: 1.35rem;
+      color: var(--gold);
+      line-height: 1.1;
+    }
+    .readout .year { font-size: 0.85rem; color: rgba(247, 241, 228, 0.7); }
+    .stage-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 240px;
+      margin: 0 14px;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      background: #16344a;
+    }
+    #scene { width: 100%; height: 100%; display: block; }
+    .icon-btn {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 5;
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 12px;
+      background: rgba(8, 18, 28, 0.72);
+      color: #f7f1e4;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+    .icon-btn:hover { background: rgba(20, 40, 58, 0.9); }
+    .meter {
+      max-width: 280px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.82rem;
+      line-height: 1.3;
+      color: rgba(247, 241, 228, 0.86);
+    }
+    .meter small { display: block; font-weight: 650; color: rgba(247, 241, 228, 0.62); }
+    .verse {
+      margin: 8px 14px 0;
+      background: linear-gradient(180deg, var(--parchment), var(--parchment-2));
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 8px 16px 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px 14px;
+      align-items: start;
+    }
+    .verse .kicker {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      background: #1d3344;
+      color: var(--gold);
+      border-radius: 10px;
+      padding: 8px 10px;
+      min-width: 118px;
+      text-align: center;
+      font-weight: 800;
+    }
+    .verse .kicker b { display: block; font-family: "Frank Ruhl Libre", David, serif; font-size: 1.05rem; color: white; font-weight: 700; }
+    .verse q {
+      margin: 0;
+      font-family: "Frank Ruhl Libre", David, "Times New Roman", serif;
+      font-size: 1.28rem;
+      line-height: 1.35;
+      quotes: none;
+    }
+    .verse .meta { color: #5c5144; font-size: 0.92rem; font-weight: 650; }
+    .verse .meta .bib { color: #7a4a12; font-weight: 800; }
+    .verse .meta cite { font-style: normal; color: var(--gold-2); font-weight: 800; }
+    .graph-dock { margin: 6px 14px 0; }
+    .graph-tab {
+      border: 0;
+      background: rgba(255, 255, 255, 0.08);
+      color: #f7f1e4;
+      border-radius: 10px 10px 0 0;
+      padding: 5px 14px 6px;
+      font: inherit;
+      font-weight: 800;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+    .graph-tab.open { background: rgba(226, 177, 90, 0.2); color: var(--gold); }
+    #graphPanel[hidden] { display: none; }
+    #graph {
+      width: 100%;
+      height: 120px;
+      display: block;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.18);
+      border-radius: 0 12px 12px 12px;
+    }
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 14px 2px;
+      scrollbar-width: thin;
+    }
+    .chips button {
+      flex: 0 0 auto;
+      border: 1px solid rgba(247, 241, 228, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+      color: rgba(247, 241, 228, 0.88);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+    .chips button small { display: block; font-weight: 650; color: var(--gold); font-size: 0.75rem; }
+    .chips button.active {
+      background: var(--gold);
+      color: #1b1712;
+      border-color: var(--gold);
+    }
+    .chips button.active small { color: #6d4b16; }
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 14px 12px;
+    }
+    .controls button {
+      font: inherit;
+      font-weight: 800;
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 16px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+    }
+    .controls button.primary { background: var(--gold); color: #1b1712; }
+    .controls .hint { margin-inline-start: auto; color: rgba(247, 241, 228, 0.55); font-size: 0.8rem; }
+    @media (max-width: 760px) {
+      body { overflow: auto; height: auto; }
+      header { align-items: flex-start; }
+      .verse { grid-template-columns: 1fr; }
+      .verse .kicker { grid-row: auto; }
+      .verse q { font-size: 1.12rem; }
+      .readout { text-align: right; }
+      .controls .hint { display: none; }
+    }
+  
+    /* polish */
+    body { background: radial-gradient(1400px 600px at 85% -20%, rgba(226,177,90,0.12), transparent 60%), linear-gradient(180deg, #0f2233 0%, #0a1824 60%, #07111a 100%); }
+    header { padding: 14px 22px 8px; }
+    header h1 { font-size: 1.75rem; letter-spacing: .01em; }
+    .readout { background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 14px; padding: 8px 14px; }
+    .meter { margin-top: 4px; font-weight: 600; }
+    .meter small { display:block; font-weight: 500; opacity: .7; }
+    .stage-wrap { margin: 0 18px; border-radius: 22px; box-shadow: 0 24px 60px rgba(0,0,0,.4), inset 0 0 0 1px rgba(255,255,255,.07); }
+    .verse { margin: 12px 18px 0; border-radius: 18px; background: linear-gradient(180deg, #fbf6ea, #f2e8d4); padding: 12px 18px 14px; }
+    .verse q, .verse .meta, .verse .kicker { transition: opacity .45s ease; }
+    .verse.fade q, .verse.fade .meta { opacity: 0; }
+    .verse q { font-size: 1.36rem; line-height: 1.55; }
+    .verse .meta { font-weight: 500; line-height: 1.5; }
+    .chips { gap: 6px; padding: 10px 18px 2px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chips button { border-color: transparent; background: rgba(255,255,255,.05); transition: background .3s, color .3s, transform .3s; }
+    .chips button:hover { background: rgba(255,255,255,.1); }
+    .chips button.active { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(226,177,90,.3); }
+    .controls { padding: 10px 18px 14px; }
+    .controls button { transition: filter .2s; }
+    .controls button:hover { filter: brightness(1.08); }
+    .controls .hint { opacity: .8; }
+
+    /* v2: compact header and bottom bar */
+    header { padding: 5px 16px 3px; }
+    header h1 { font-size: 1.2rem; }
+    header p { font-size: 0.78rem; margin: 0; }
+    .readout { display: flex; align-items: baseline; gap: 12px; padding: 4px 12px; min-width: 0; }
+    .readout .date { font-size: 1.1rem; }
+    .readout .year { font-size: 0.75rem; }
+    .meter { margin: 0; font-size: 0.75rem; max-width: 240px; }
+    .meter small { font-size: 0.68rem; }
+    .stage-wrap { margin: 0 12px; }
+    .verse { margin: 8px 12px 0; padding: 8px 14px 10px; }
+    .verse q { font-size: 1.2rem; line-height: 1.45; }
+    .verse .meta { font-size: 0.84rem; }
+    .graph-dock { margin: 4px 12px 0; }
+    .bottom { display: flex; align-items: center; gap: 8px; padding: 6px 12px 8px; max-width: 100%; }
+    .chips { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 4px; padding: 0; overflow: visible; }
+    .chips button { padding: 3px 2px; font-size: 0.72rem; line-height: 1.15; border-radius: 10px; min-width: 0; white-space: normal; overflow: hidden; }
+    .chips button small { font-size: 0.64rem; }
+    .controls { padding: 0; flex: 0 0 auto; }
+    .controls button { padding: 7px 12px; font-size: 0.82rem; white-space: nowrap; }
+    .controls .hint { display: none; }
+    body { overflow-x: hidden; }
+    @media (max-width: 1100px) {
+      .chips { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+      .verse q { font-size: 1.08rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>תיבת נח בימי המבול</h1>
+      <p>חתך של הארץ: המים עולים ויורדים לפי הפסוקים ולפי חשבון רש״י</p>
+    </div>
+    <div class="readout">
+      <div class="date" id="dateLabel">י׳ במרחשוון</div>
+      <div class="year" id="yearLabel">שנת שש מאות לנח</div>
+      <div class="meter" id="meter"></div>
+    </div>
+  </header>
+
+  <div class="stage-wrap">
+    <canvas id="scene" aria-label="חתך המבול: הרים, מים ותיבה"></canvas>
+    <button type="button" id="full" class="icon-btn" aria-label="מסך מלא">
+      <svg id="fullIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/>
+      </svg>
+    </button>
+  </div>
+
+  <section class="verse" aria-live="polite">
+    <div class="kicker" id="kicker"></div>
+    <q id="verse"></q>
+    <div class="meta" id="note"></div>
+  </section>
+
+  <div class="graph-dock">
+    <button type="button" id="graphTab" class="graph-tab">גרף המים</button>
+    <div id="graphPanel" hidden>
+      <canvas id="graph" aria-label="גרף גובה המים לאורך השנה"></canvas>
+    </div>
+  </div>
+  <div class="bottom">
+  <div class="chips" id="chips"></div>
+  <div class="controls">
+    <button type="button" class="primary" id="play">הפעל את השנה</button>
+    <div class="hint">לחיצה על תחנה או על הגרף · רווח להפעלה ולהפסקה</div>
+  </div>
+  </div>
+
+  <script>
+    const PEAK = 0.9; // the peaks line; 15 cubits above it is a thin band (as in the first version)
+    const HS = 1; // mountains at their normal height
+    const MIN_DAY = -7;
+    const MAX_DAY = 364;
+    const MONTHS = [
+      ["מרחשוון", 29], ["כסלו", 30], ["טבת", 29], ["שבט", 30],
+      ["אדר", 29], ["ניסן", 30], ["אייר", 29], ["סיון", 30],
+      ["תמוז", 29], ["אב", 30], ["אלול", 29], ["תשרי", 30], ["מרחשוון", 29]
+    ];
+    const LEVELS = [
+      // single source of truth for the scene, readout and graph (1 = 15 cubits over the peaks, PEAK = the peaks)
+      [-7, 0],                        // 10 Marcheshvan: entry, dry ground
+      [0, 0.2 * 2 / 3],               // 17 Marcheshvan: during the 7 days the water rose a little, ~2/3 of the ark's height (7:10); the ark still grounded
+      [40, PEAK],                     // 28 Kislev, end of the 40 days: exactly the peaks line; linear from 17 Marcheshvan; uniformity not stated in the text
+      [186, 1],                       // next stage: 15 cubits over the peaks, linear from 28 Kislev (assumption; fountains still open, Rashi 8:2)
+      [190, 1],                       // plateau to the end of the 150 days, 1 Sivan (8:2-3; Rashi)
+      [206, PEAK + (11 / 15) * (1 - PEAK)], [249, PEAK - 0.06],   // 1 cubit per 4 days; 17 Sivan 11 cubits (Rashi 8:4); 1 Av: just under the peaks line so the tips show (8:5)
+      [308, 0], [364, 0]              // 1 Av -> 1 Tishrei: drop proportional to the dates in the text (8:5, 8:13)
+    ];
+    const STAGES = [
+      { id: "enter", bib: "בכתוב: שבעה ימים (ז, ד); י׳ במרחשוון – רש״י", day: -7, title: "הכניסה לתיבה",
+        verse: "בֹּא אַתָּה וְכָל־בֵּיתְךָ אֶל־הַתֵּבָה כִּי־אֹתְךָ רָאִיתִי צַדִּיק לְפָנַי בַּדּוֹר הַזֶּה. מִכֹּל הַבְּהֵמָה הַטְּהוֹרָה תִּקַּח־לְךָ שִׁבְעָה שִׁבְעָה… וּמִן־הַבְּהֵמָה אֲשֶׁר לֹא טְהֹרָה הִוא שְׁנַיִם… כִּי לְיָמִים עוֹד שִׁבְעָה אָנֹכִי מַמְטִיר עַל־הָאָרֶץ אַרְבָּעִים יוֹם וְאַרְבָּעִים לָיְלָה. וְנֹחַ בֶּן־שֵׁשׁ מֵאוֹת שָׁנָה… וַיָּבֹא נֹחַ וּבָנָיו וְאִשְׁתּוֹ וּנְשֵׁי־בָנָיו אִתּוֹ אֶל־הַתֵּבָה מִפְּנֵי מֵי הַמַּבּוּל",
+        ref: "בראשית ז, א–ז",
+        note: "ימי אבלו של מתושלח. רש״י" },
+      { id: "burst", bib: "בכתוב: שנת 600, החודש השני, י״ז בחודש (ז, יא). מרחשוון – רש״י", day: 0, title: "נבקעו המעיינות",
+        verse: "בִּשְׁנַת שֵׁשׁ־מֵאוֹת שָׁנָה לְחַיֵּי־נֹחַ בַּחֹדֶשׁ הַשֵּׁנִי בְּשִׁבְעָה־עָשָׂר יוֹם לַחֹדֶשׁ בַּיּוֹם הַזֶּה נִבְקְעוּ כָּל־מַעְיְנֹת תְּהוֹם רַבָּה וַאֲרֻבֹּת הַשָּׁמַיִם נִפְתָּחוּ. וַיְהִי הַגֶּשֶׁם עַל־הָאָרֶץ אַרְבָּעִים יוֹם וְאַרְבָּעִים לָיְלָה",
+        ref: "בראשית ז, יא–יב",
+        note: "הגשם ירד תחילה ברחמים. רש״י" },
+      { id: "lift", bib: "בכתוב: 40 יום (ז, יז)", day: 16, title: "התיבה נשאת",
+        verse: "וַיְהִי הַמַּבּוּל אַרְבָּעִים יוֹם עַל־הָאָרֶץ וַיִּרְבּוּ הַמַּיִם וַיִּשְׂאוּ אֶת־הַתֵּבָה וַתָּרָם מֵעַל הָאָרֶץ",
+        ref: "בראשית ז, יז",
+        note: "התיבה שקועה במים 11 אמה. רש״י" },
+      { id: "stop", bib: "בכתוב: 40 יום (ז, יב). כ״ח בכסלו – רש״י", day: 40, title: "פסקו הגשמים",
+        verse: "וַיִּגְבְּרוּ הַמַּיִם וַיִּרְבּוּ מְאֹד עַל־הָאָרֶץ וַתֵּלֶךְ הַתֵּבָה עַל־פְּנֵי הַמָּיִם",
+        ref: "בראשית ז, יח",
+        note: "המים בגובה ראשי ההרים" },
+      { id: "peak", bib: "בכתוב: 15 אמה (ז, כ); 150 יום (ז, כד)", day: 186, title: "חמש־עשרה אמה",
+        verse: "וַיְכֻסּוּ כָּל־הֶהָרִים הַגְּבֹהִים אֲשֶׁר־תַּחַת כָּל־הַשָּׁמָיִם. חֲמֵשׁ עֶשְׂרֵה אַמָּה מִלְמַעְלָה גָּבְרוּ הַמָּיִם וַיְכֻסּוּ הֶהָרִים… וַיִּגְבְּרוּ הַמַּיִם עַל־הָאָרֶץ חֲמִשִּׁים וּמְאַת יוֹם",
+        ref: "בראשית ז, יט–כ; ז, כד",
+        note: "המעיינות עוד פתוחים. רש״י" },
+      { id: "remember", bib: "בכתוב: מקצה 150 יום (ח, ג). א׳ בסיון – רש״י", day: 190, title: "המים החלו לחסור",
+        verse: "וַיִּזְכֹּר אֱלֹהִים אֶת־נֹחַ וְאֵת כָּל־הַחַיָּה וְאֵת כָּל־הַבְּהֵמָה אֲשֶׁר אִתּוֹ בַּתֵּבָה וַיַּעֲבֵר אֱלֹהִים רוּחַ עַל־הָאָרֶץ וַיָּשֹׁכּוּ הַמָּיִם… וַיַּחְסְרוּ הַמַּיִם מִקְצֵה חֲמִשִּׁים וּמְאַת יוֹם",
+        ref: "בראשית ח, א–ג",
+        note: "המים החלו לחסור. רש״י" },
+      { id: "rest", bib: "בכתוב: החודש השביעי, י״ז בחודש (ח, ד). סיון – רש״י", day: 206, title: "מנוחת התיבה",
+        verse: "וַתָּנַח הַתֵּבָה בַּחֹדֶשׁ הַשְּׁבִיעִי בְּשִׁבְעָה־עָשָׂר יוֹם לַחֹדֶשׁ עַל הָרֵי אֲרָרָט",
+        ref: "בראשית ח, ד",
+        note: "עוד 11 אמה מעל ההר. רש״י" },
+      { id: "peaks", bib: "בכתוב: החודש העשירי, א׳ בחודש (ח, ה). אב – רש״י", day: 249, title: "ראשי ההרים",
+        verse: "וְהַמַּיִם הָיוּ הָלוֹךְ וְחָסוֹר עַד הַחֹדֶשׁ הָעֲשִׂירִי בָּעֲשִׂירִי בְּאֶחָד לַחֹדֶשׁ נִרְאוּ רָאשֵׁי הֶהָרִים",
+        ref: "בראשית ח, ה",
+        note: "אמה לארבעה ימים מסיון. רש״י" },
+      { id: "raven", bib: "בכתוב: מקץ 40 יום (ח, ו). י׳ באלול – חשבון לפי רש״י", day: 288, title: "העורב",
+        verse: "וַיְהִי מִקֵּץ אַרְבָּעִים יוֹם וַיִּפְתַּח נֹחַ אֶת־חַלּוֹן הַתֵּבָה אֲשֶׁר עָשָׂה. וַיְשַׁלַּח אֶת־הָעֹרֵב וַיֵּצֵא יָצוֹא וָשׁוֹב עַד־יְבֹשֶׁת הַמַּיִם מֵעַל הָאָרֶץ",
+        ref: "בראשית ח, ו–ז",
+        note: "העורב סובב את התיבה. רש״י" },
+      { id: "dove", bib: "בכתוב: שבעה ימים (ח, י). י״ז באלול – חשבון לפי רש״י", day: 295, title: "היונה",
+        verse: "וַיְשַׁלַּח אֶת־הַיּוֹנָה מֵאִתּוֹ לִרְאוֹת הֲקַלּוּ הַמַּיִם מֵעַל פְּנֵי הָאֲדָמָה. וְלֹא־מָצְאָה הַיּוֹנָה מָנוֹחַ לְכַף־רַגְלָהּ וַתָּשָׁב אֵלָיו אֶל־הַתֵּבָה כִּי־מַיִם עַל־פְּנֵי כָל־הָאָרֶץ",
+        ref: "בראשית ח, ח–ט",
+        note: "לא מצאה היונה מנוח. רש״י" },
+      { id: "leaf", bib: "בכתוב: שבעת ימים אחרים (ח, י). כ״ד באלול – חשבון לפי רש״י", day: 302, title: "עלה זית",
+        verse: "וַיָּחֶל עוֹד שִׁבְעַת יָמִים אֲחֵרִים וַיֹּסֶף שַׁלַּח אֶת־הַיּוֹנָה מִן־הַתֵּבָה. וַתָּבֹא אֵלָיו הַיּוֹנָה לְעֵת עֶרֶב וְהִנֵּה עֲלֵה־זַיִת טָרָף בְּפִיהָ וַיֵּדַע נֹחַ כִּי־קַלּוּ הַמַּיִם מֵעַל הָאָרֶץ",
+        ref: "בראשית ח, י–יא",
+        note: "עלה זית טרוף בפיה" },
+      { id: "crust", bib: "בכתוב: שנת 601, החודש הראשון, א׳ בחודש (ח, יג). תשרי – רש״י", day: 308, title: "חרבו פני האדמה",
+        verse: "וַיִּיָּחֶל עוֹד שִׁבְעַת יָמִים אֲחֵרִים וַיְשַׁלַּח אֶת־הַיּוֹנָה וְלֹא־יָסְפָה שׁוּב־אֵלָיו עוֹד. וַיְהִי בְּאַחַת וְשֵׁשׁ־מֵאוֹת שָׁנָה בָּרִאשׁוֹן בְּאֶחָד לַחֹדֶשׁ חָרְבוּ הַמַּיִם מֵעַל הָאָרֶץ וַיָּסַר נֹחַ אֶת־מִכְסֵה הַתֵּבָה וַיַּרְא וְהִנֵּה חָרְבוּ פְּנֵי הָאֲדָמָה",
+        ref: "בראשית ח, יב–יג",
+        note: "חרבו: טיט שקרמו פניו. רש״י" },
+      { id: "dry", bib: "בכתוב: החודש השני, כ״ז בחודש – יבשה הארץ; צא מן התיבה (ח, יד–טז). מרחשוון – רש״י", day: 364, title: "היציאה מן התיבה",
+        verse: "וּבַחֹדֶשׁ הַשֵּׁנִי בְּשִׁבְעָה וְעֶשְׂרִים יוֹם לַחֹדֶשׁ יָבְשָׁה הָאָרֶץ. צֵא מִן־הַתֵּבָה אַתָּה וְאִשְׁתְּךָ וּבָנֶיךָ וּנְשֵׁי־בָנֶיךָ אִתָּךְ… וַיִּבֶן נֹחַ מִזְבֵּחַ לַה׳",
+        ref: "בראשית ח, יד–טז; ח, כ",
+        note: "יבשה: שנה תמימה. רש״י" }
+    ];
+
+    const MOUNTAINS = [
+      { x: 0.2, r: 0.15, h: PEAK, soil: "#5e4a32", rock: "#7f97a8" },
+      { x: 0.53, r: 0.13, h: PEAK, soil: "#625038", rock: "#89a0af" },
+      { x: 0.95, r: 0.15, h: PEAK, soil: "#6e563c", rock: "#93aaba" },
+      { x: 0.74, r: 0.2, h: PEAK, soil: "#5a4632", rock: "#647f92", ararat: true },
+      { x: 0.06, r: 0.12, h: 0.55 * HS, soil: "#6d5438", rock: "#8ea4b3" },
+      { x: 0.4, r: 0.14, h: 0.58 * HS, soil: "#6a5140", rock: "#738da0", olive: true },
+      { x: 0.62, r: 0.1, h: 0.4 * HS, soil: "#6a5440", rock: "#8199a9" },
+      { x: 0.32, r: 0.09, h: 0.3 * HS, soil: "#705840", rock: "#8aa0ae" }
+    ];
+    // background ranges: [x, half-width, height] peaks; all below the highest peak
+    const RANGES = [
+      { a: 0.22, peaks: [[0.05,0.12,0.7 * HS],[0.18,0.1,0.82 * HS],[0.3,0.13,0.76 * HS],[0.46,0.12,0.86 * HS],[0.6,0.11,0.79 * HS],[0.86,0.13,0.84 * HS],[1.0,0.1,0.72 * HS]] },
+      { a: 0.38, peaks: [[0.0,0.1,0.5 * HS],[0.13,0.12,0.66 * HS],[0.28,0.1,0.58 * HS],[0.45,0.14,0.7 * HS],[0.62,0.1,0.6 * HS],[0.82,0.12,0.68 * HS],[0.98,0.1,0.55 * HS]] }
+    ];
+
+    const sceneEl = document.getElementById("scene");
+    const graphEl = document.getElementById("graph");
+    const chipsEl = document.getElementById("chips");
+    const hashStage = STAGES.findIndex((s) => s.id === location.hash.replace("#", ""));
+    let simDay = hashStage >= 0 ? STAGES[hashStage].day : MIN_DAY;
+    let mode = "idle";
+    let holdUntil = 0;
+    let seekFrom = MIN_DAY, seekTo = MIN_DAY, seekT0 = 0;
+    let lastTs = 0;
+    let clock = 0;
+
+    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+    function levelOf(day) {
+      if (day <= LEVELS[0][0]) return LEVELS[0][1];
+      for (let i = 1; i < LEVELS.length; i++) {
+        const [d0, y0] = LEVELS[i - 1];
+        const [d1, y1] = LEVELS[i];
+        if (day <= d1) {
+          const u = (day - d0) / (d1 - d0);
+          const t = u;
+          return y0 + (y1 - y0) * t;
+        }
+      }
+      return LEVELS[LEVELS.length - 1][1];
+    }
+    function stageIndex(day) {
+      let idx = 0;
+      for (let i = 0; i < STAGES.length; i++) if (day + 0.05 >= STAGES[i].day) idx = i;
+      return idx;
+    }
+    function hebNum(n) {
+      const o = ["", "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט"];
+      const t = ["", "י", "כ", "ל"];
+      if (n === 15) return "ט״ו";
+      if (n === 16) return "ט״ז";
+      const s = t[Math.floor(n / 10)] + o[n % 10];
+      if (s.length < 2) return s + "׳";
+      return s.slice(0, -1) + "״" + s.slice(-1);
+    }
+    function dateOf(day) {
+      let d = Math.round(day + 16);
+      if (d < 0) d = 0;
+      for (const [name, len] of MONTHS) {
+        if (d < len) return hebNum(d + 1) + " ב" + name;
+        d -= len;
+      }
+      return "כ״ז במרחשוון";
+    }
+    function cubitsAbove(level) { return (level - PEAK) / (1 - PEAK) * 15; }
+    function fit(canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const w = Math.max(1, Math.round(rect.width * dpr));
+      const h = Math.max(1, Math.round(rect.height * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, w: rect.width, h: rect.height };
+    }
+
+    function drawScene(ts) {
+      const { ctx, w, h } = fit(sceneEl);
+      if (w < 2 || h < 2) return;
+      const day = simDay;
+      const level = levelOf(day);
+      const ground = h * 0.90;
+      const margin = 18;
+      const range = (ground - margin) / (1 + (19 / 15) * (1 - PEAK));
+      const yOf = (lv) => ground - lv * range;
+      const cubit = range * (1 - PEAK) / 15;
+      const waterY = yOf(level);
+      const storm = clamp(day < 0 ? 0 : day < 40 ? Math.min(1, day / 6) : Math.max(0, 1 - (day - 40) / 30), 0, 1);
+      const clear = clamp((day - 190) / 80, 0, 1);
+      const skyA = mix("#1d3144", "#7eb4d4", Math.max(0, clear - storm));
+      const skyB = mix("#6a5b48", "#f3e2c0", clear * (1 - storm * 0.85));
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, storm > 0.4 ? mix(skyA, "#243246", storm) : skyA);
+      g.addColorStop(0.55, mix("#38566c", skyB, clear));
+      g.addColorStop(1, "#3d3428");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+
+      if (day > 210) {
+        const sunX = w * (0.18 + 0.2 * Math.sin(day / 40));
+        const sunY = h * 0.16;
+        const sg = ctx.createRadialGradient(sunX, sunY, 4, sunX, sunY, 70);
+        sg.addColorStop(0, "rgba(255,236,180,0.95)");
+        sg.addColorStop(1, "rgba(255,236,180,0)");
+        ctx.fillStyle = sg;
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 70, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      drawClouds(ctx, w, h, storm, ts, day);
+      drawEarth(ctx, w, h, ground);
+      drawDistant(ctx, w, yOf, ground);
+      for (const m of MOUNTAINS) drawMountain(ctx, m, w, yOf, ground, level, day);
+      drawSprings(ctx, w, yOf, ground, day, ts);
+      drawMud(ctx, w, h, ground, day);
+      const ark = placeArk(w, yOf, level, day, ts, range);
+      sceneEl._m = { waterY: yOf(level), peakY: yOf(PEAK), groundY: yOf(0), topY: yOf(1) };
+      const olive = oliveSpot(w, yOf);
+      drawArk(ctx, ark, day, ts, true);
+      drawWater(ctx, w, h, yOf, level, ts, day);
+      drawReference(ctx, w, yOf);
+      drawArk(ctx, ark, day, ts, false);
+      if (olive.y - 70 < yOf(level)) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, w, yOf(level) + 1);
+        ctx.clip();
+        drawOlive(ctx, olive.x, olive.y);
+        ctx.restore();
+      }
+      drawBirds(ctx, ark, day, ts, olive, w, yOf);
+      drawComing(ctx, ark, day, ts);
+      drawLeaving(ctx, ark, w, yOf, day, ts);
+      drawRain(ctx, w, yOf(level), day, ts);
+      drawAxis(ctx, w, h, yOf, level);
+    }
+
+    function mix(a, b, t) {
+      const pa = hex(a), pb = hex(b);
+      const c = pa.map((v, i) => Math.round(v + (pb[i] - v) * clamp(t, 0, 1)));
+      return `rgb(${c[0]},${c[1]},${c[2]})`;
+    }
+    function hex(s) {
+      const n = parseInt(s.slice(1), 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    }
+    function drawDistant(ctx, w, yOf, ground) {
+      RANGES.forEach((layer, li) => {
+        const shift = Math.sin(clock / 30000 + li) * (4 + li * 4);
+        ctx.beginPath();
+        ctx.moveTo(-20, ground);
+        for (const [px, r, ph] of layer.peaks) {
+          const cx = px * w + shift, half = r * w, py = yOf(ph);
+          ctx.lineTo(cx - half, ground);
+          ctx.quadraticCurveTo(cx - half * 0.3, py + (ground - py) * 0.35, cx, py);
+          ctx.quadraticCurveTo(cx + half * 0.3, py + (ground - py) * 0.35, cx + half, ground);
+        }
+        ctx.lineTo(w + 20, ground);
+        ctx.closePath();
+        const g = ctx.createLinearGradient(0, yOf(0.86 * HS), 0, ground);
+        g.addColorStop(0, li ? `rgba(120,140,160,${layer.a + 0.1})` : `rgba(170,190,208,${layer.a})`);
+        g.addColorStop(1, li ? "rgba(70,72,70,0.55)" : "rgba(110,120,128,0.4)");
+        ctx.fillStyle = g;
+        ctx.fill();
+      });
+    }
+    function oliveSpot(w, yOf) {
+      const cx = 0.4 * w;
+      return { x: cx + w * 0.05, y: yOf(0.08) }; // above water on 24 Elul, under it on 17 Elul
+    }
+    function drawOlive(ctx, x, y) {
+      ctx.save();
+      ctx.strokeStyle = "#5c4630";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + 6, y - 28, x + 2, y - 52);
+      ctx.stroke();
+      ctx.fillStyle = "#6e8f4e";
+      ctx.beginPath();
+      ctx.ellipse(x + 2, y - 64, 20, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#8eaf62";
+      ctx.beginPath();
+      ctx.ellipse(x - 10, y - 56, 13, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#3d6b32";
+      for (const [dx, dy] of [[-6, -60], [8, -66], [2, -52]]) {
+        ctx.beginPath();
+        ctx.ellipse(x + dx, y + dy, 2.2, 3, 0.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawClouds(ctx, w, h, storm, ts, day) {
+      ctx.save();
+      const drift = (ts / 1000) * (8 + storm * 18);
+      for (let i = 0; i < 6; i++) {
+        const x = ((i * 180 - drift) % (w + 220) + w + 220) % (w + 220) - 80;
+        const y = 18 + (i % 3) * 22;
+        ctx.fillStyle = storm > 0.3 ? `rgba(70,78,88,${0.35 + storm * 0.35})` : `rgba(255,255,255,${0.28 + (i % 2) * 0.12})`;
+        cloud(ctx, x, y, 46 + (i % 3) * 10);
+      }
+      ctx.restore();
+    }
+    function cloud(ctx, x, y, r) {
+      ctx.beginPath();
+      ctx.arc(x, y, r * 0.7, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.7, y + 4, r * 0.55, 0, Math.PI * 2);
+      ctx.arc(x - r * 0.6, y + 6, r * 0.48, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    function drawEarth(ctx, w, h, ground) {
+      const eg = ctx.createLinearGradient(0, ground, 0, h);
+      eg.addColorStop(0, "#6b5134");
+      eg.addColorStop(0.4, "#4e3926");
+      eg.addColorStop(1, "#2b2118");
+      ctx.fillStyle = eg;
+      ctx.fillRect(0, ground, w, h - ground);
+      ctx.strokeStyle = "rgba(255,220,170,0.18)";
+      ctx.lineWidth = 1;
+      for (let i = 1; i <= 3; i++) {
+        const y = ground + i * 12;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.bezierCurveTo(w * 0.3, y + 4, w * 0.6, y - 3, w, y + 2);
+        ctx.stroke();
+      }
+    }
+    function drawMountain(ctx, m, w, yOf, ground, level, day) {
+      const cx = m.x * w;
+      const half = m.r * w;
+      const peakY = yOf(m.h);
+      const baseY = ground + 2;
+      const emerged = Math.max(0, m.h - level);
+      const flat = m.ararat ? Math.max(54, half * 0.22) : 0;
+      ctx.beginPath();
+      ctx.moveTo(cx - half, baseY);
+      ctx.quadraticCurveTo(cx - half * 0.35, peakY + (baseY - peakY) * 0.45, cx - flat, peakY);
+      if (flat) ctx.lineTo(cx + flat, peakY);
+      else ctx.lineTo(cx, peakY);
+      ctx.quadraticCurveTo(cx + half * 0.35, peakY + (baseY - peakY) * 0.45, cx + half, baseY);
+      ctx.closePath();
+      const mg = ctx.createLinearGradient(cx, peakY, cx, baseY);
+      mg.addColorStop(0, m.rock);
+      mg.addColorStop(0.55, m.soil);
+      mg.addColorStop(1, "#3a2c20");
+      ctx.fillStyle = mg;
+      ctx.fill();
+      if (emerged > 0.002 && day > 240) {
+        const cap = 6 + Math.min(30, emerged * 120);
+        ctx.beginPath();
+        ctx.moveTo(cx - flat - half * 0.08, peakY + cap);
+        ctx.lineTo(cx - flat, peakY);
+        ctx.lineTo(cx + flat, peakY);
+        ctx.lineTo(cx + flat + half * 0.08, peakY + cap);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(210,228,236,${0.22 * clamp(1 - (day - 308) / 40, 0, 1)})`;
+        ctx.fill();
+      }
+      if (day > 320 && !m.olive && !m.ararat && level < m.h - 0.08) {
+        tree(ctx, cx - half * 0.15, yOf(Math.min(m.h - 0.06, Math.max(level, 0.08))) - 2, true);
+      }
+      if (m.ararat && day >= 240 && level < m.h + 0.02) {
+        ctx.save();
+        ctx.direction = "rtl";
+        ctx.fillStyle = "rgba(255,248,230,0.95)";
+        ctx.font = "700 16px Assistant, Segoe UI, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("הרי אררט", cx + half * 0.55, peakY + (baseY - peakY) * 0.28);
+        ctx.restore();
+      }
+    }
+    function drawMud(ctx, w, h, ground, day) {
+      if (day < 300) return;
+      const wet = clamp((day - 300) / 8, 0, 1) * clamp(1 - (day - 308) / 56, 0, 1);
+      if (wet <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = wet;
+      const mg = ctx.createLinearGradient(0, ground - 6, 0, h);
+      mg.addColorStop(0, "rgba(58,44,30,0.85)");
+      mg.addColorStop(1, "rgba(30,22,16,0.9)");
+      ctx.fillStyle = mg;
+      ctx.fillRect(0, ground - 3, w, h - ground + 3);
+      ctx.fillStyle = "rgba(150,190,205,0.45)";
+      for (let i = 0; i < 9; i++) {
+        const x = w * (0.06 + i * 0.11) + (i % 2) * 18;
+        ctx.beginPath();
+        ctx.ellipse(x, ground + 6 + (i % 3) * 7, 26 + (i % 4) * 10, 2.6, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    function tree(ctx, x, y, green) {
+      ctx.strokeStyle = "#5a3d28";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y - 16);
+      ctx.stroke();
+      ctx.fillStyle = green ? "#2f6b3a" : "#6d7a48";
+      ctx.beginPath();
+      ctx.arc(x, y - 22, 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    function drawSprings(ctx, w, yOf, ground, day, ts) {
+      if (day < 0 || day > 48) return;
+      const power = day < 40 ? 1 : 1 - (day - 40) / 8;
+      ctx.save();
+      ctx.strokeStyle = `rgba(190, 230, 255, ${0.35 * power})`;
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      for (let i = 0; i < 8; i++) {
+        const x = w * (0.08 + i * 0.11);
+        const pulse = 26 + Math.sin(ts / 220 + i) * 14;
+        ctx.beginPath();
+        ctx.moveTo(x, ground - 2);
+        ctx.lineTo(x + Math.sin(ts / 180 + i) * 6, ground - pulse * power);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    function drawWater(ctx, w, h, yOf, level, ts, day) {
+      if (level <= 0) return;
+      const t = ts / 1000;
+      const amp = (day > 50 ? 0.9 : 3.4) + Math.min(level, 0.75) * (day > 50 ? 1.2 : 3.2);
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 8) {
+        const y = yOf(level)
+          + Math.sin(x * 0.018 + t * 1.6) * amp
+          + Math.sin(x * 0.009 - t * 0.9) * amp * 0.55;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      const wg = ctx.createLinearGradient(0, yOf(level), 0, h);
+      const deep = day < 40 ? 0.78 : 0.7;
+      wg.addColorStop(0, `rgba(126, 196, 214, ${0.55 + level * 0.2})`);
+      wg.addColorStop(0.25, `rgba(36, 116, 158, ${deep})`);
+      wg.addColorStop(1, `rgba(8, 40, 64, ${0.88})`);
+      ctx.fillStyle = wg;
+      ctx.fill();
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 8) {
+        const y = yOf(level) + Math.sin(x * 0.018 + t * 1.6) * amp;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "rgba(255,255,255,0.55)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      if (day > 188 && day < 210) {
+        ctx.strokeStyle = "rgba(255,255,255,0.55)";
+        ctx.lineWidth = 2;
+        const surface = yOf(level);
+        for (let i = 0; i < 16; i++) {
+          const y = surface + 14 + (i % 5) * 16;
+          const x = (t * 100 + i * 110) % (w + 160) - 80;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + 46, y - 2);
+          ctx.stroke();
+        }
+      }
+    }
+    function drawReference(ctx, w, yOf) {
+      const y = yOf(PEAK);
+      ctx.save();
+      ctx.setLineDash([6, 7]);
+      ctx.strokeStyle = "rgba(226,177,90,0.9)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(54, y);
+      ctx.lineTo(w - 16, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.direction = "rtl";
+      ctx.font = "700 13px Assistant, Segoe UI, sans-serif";
+      ctx.fillStyle = "#f6e2b4";
+      ctx.textAlign = "right";
+      ctx.fillText("קו ראשי ההרים הגבוהים", w - 18, y - 6);
+      ctx.restore();
+    }
+    function placeArk(w, yOf, level, day, ts, range) {
+      const araratX = 0.74 * w;
+      const wind = day >= 188 && day < 206;
+      let x;
+      if (day >= 206) x = araratX;
+      else if (wind) {
+        const fade = clamp((day - 201) / 5, 0, 1);
+        const travel = w * 0.42 + Math.sin(ts / 1400) * w * 0.24;
+        x = travel * (1 - fade) + araratX * fade;
+      } else if (day >= 6) {
+        x = w * 0.38 + Math.sin(ts / 6500) * w * 0.08;
+      } else x = w * 0.4;
+      const s = range * 0.2;            // symbolic ark size (not to scale)
+      const free = s * 0.63, draft = s * 0.37;
+      const water = yOf(level);
+      let keel = water + draft;
+      const valley = yOf(0);
+      if (keel > valley) keel = valley;
+      // grounded through 17 Marcheshvan and then borne up smoothly over 3 days (7:17)
+      const liftT = clamp(day / 3, 0, 1), lt = liftT * liftT * (3 - 2 * liftT);
+      if (day < 190) keel = valley + (keel - valley) * lt;
+      const peakY = yOf(PEAK);
+      const rested = day >= 206;
+      // 1-17 Sivan: the ark settles onto Ararat; its sunk part (11 cubits, Rashi 8:4) is drawn under the water
+      const settle = clamp((day - 190) / 16, 0, 1);
+      if (rested) keel = peakY + 3;
+      else if (day >= 190) keel = keel + (peakY + 3 - keel) * settle;
+      const top = Math.min(keel - s, water - free);
+      const bob = rested ? 0 : Math.sin(ts / 1050) * (wind ? 2.2 : 2.4) * (1 - settle) * lt;
+      return { x, keel: keel + bob, h: keel - top, s, draft, water, rested, wind };
+    }
+    function drawArk(ctx, ark, day, ts, wet) {
+      const water = ark.water;
+      ctx.save();
+      ctx.beginPath();
+      if (wet) ctx.rect(-4000, water, 8000, 4000);
+      else ctx.rect(-4000, -4000, 8000, water + 4000);
+      ctx.clip();
+      if (wet && ark.keel <= water) { ctx.restore(); return; }
+      const { x, keel, h, s: sz } = ark;
+      const hull = h - sz * 0.26;
+      const halfW = sz * 0.92;
+      const hullTop = keel - hull;
+      ctx.translate(x, 0);
+      ctx.beginPath();
+      ctx.moveTo(-halfW, keel - hull);
+      ctx.lineTo(-halfW, keel - sz * 0.05);
+      ctx.quadraticCurveTo(-halfW * 0.45, keel + sz * 0.012, 0, keel + sz * 0.004);
+      ctx.quadraticCurveTo(halfW * 0.45, keel + sz * 0.012, halfW, keel - sz * 0.05);
+      ctx.lineTo(halfW, keel - hull);
+      ctx.closePath();
+      const hg = ctx.createLinearGradient(0, keel - h, 0, keel);
+      hg.addColorStop(0, wet ? "#6d4a2c" : "#c4844e");
+      hg.addColorStop(1, wet ? "#3d2818" : "#6a3d22");
+      ctx.fillStyle = hg;
+      ctx.fill();
+      ctx.strokeStyle = "#3b2415";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(48,28,14,0.4)";
+      ctx.lineWidth = 1.4;
+      for (const frac of [0.28, 0.52, 0.76]) {
+        const y = hullTop + sz * 0.47 * (1 - frac) + 4;
+        ctx.beginPath();
+        ctx.moveTo(-halfW + 4, y);
+        ctx.lineTo(halfW - 4, y);
+        ctx.stroke();
+      }
+      if (day < 308) {
+        ctx.beginPath();
+        ctx.moveTo(-halfW, hullTop);
+        ctx.lineTo(-sz * 0.1, keel - h);
+        ctx.lineTo(sz * 0.1, keel - h);
+        ctx.lineTo(halfW, hullTop);
+        ctx.closePath();
+        ctx.fillStyle = wet ? "#2c1d12" : "#3e2a1c";
+        ctx.fill();
+        ctx.stroke();
+        if (!wet) {
+          const glow = 0.55 + Math.sin(ts / 500) * 0.2;
+          ctx.fillStyle = `rgba(255, 214, 120, ${glow})`;
+          const ww = Math.max(8, sz * 0.1);
+          ctx.fillRect(-ww / 2, keel - h + sz * 0.04, ww, sz * 0.07);
+        }
+      } else if (!wet) {
+        ctx.beginPath();
+        ctx.ellipse(0, hullTop + 2, halfW * 0.38, sz * 0.045, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#1b140f";
+        ctx.fill();
+      }
+      ctx.fillStyle = "#2a1b12";
+      if ((day < -0.5 || day >= 360) && !wet) {
+        ctx.beginPath();
+        ctx.moveTo(-halfW * 0.55, hullTop + 4);
+        ctx.lineTo(-halfW * 0.82, hullTop + sz * 0.1);
+        ctx.lineTo(-halfW * 0.82, hullTop + sz * 0.3);
+        ctx.lineTo(-halfW * 0.55, hullTop + sz * 0.36);
+        ctx.fill();
+      } else if (!wet) {
+        ctx.fillRect(-halfW * 0.72, hullTop + sz * 0.08, Math.max(8, sz * 0.09), sz * 0.2);
+      }
+      ctx.restore();
+    }
+    function drawRain(ctx, w, waterY, day, ts) {
+      if (day < 0 || day > 42) return;
+      const t = ts / 1000;
+      const rain = day < 36 ? 1 : (42 - day) / 6;
+      ctx.save();
+      ctx.strokeStyle = "rgba(210,225,235,0.5)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 110 * rain; i++) {
+        const x = (i * 97 + t * 420) % w;
+        const y = (i * 57 + t * 680) % Math.max(24, waterY - 8);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - 3, y + 13);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    function drawBirds(ctx, ark, day, ts, olive, w, yOf) {
+      const t = ts / 1000;
+      const top = ark.keel - ark.h;
+      // raven only before the first dove (8:7)
+      if (day >= 288 && day < 295) {
+        const ang = t * 1.4;
+        bird(ctx, ark.x + Math.cos(ang) * 70, top - 18 + Math.sin(ang) * 16, "#1c1c1c", 0.9, Math.sin(t * 10), false);
+      }
+      const phase = day >= 360 ? 4 : day >= 308 ? 3 : day >= 302 ? 2 : day >= 295 ? 1 : 0;
+      if (phase !== doveState.phase) { doveState.phase = phase; doveState.t0 = ts; }
+      const el = ts - doveState.t0;
+      const q = clamp(el / 14000, 0, 1);                 // slow, gentle flights (~14 s)
+      const home = { x: ark.x + ark.s * 0.2, y: top - 22 };
+      const tree = { x: olive.x + 4, y: olive.y - 70 };
+      const bowC = { x: w * 0.34, y: yOf(0.58 * HS) - 30 - Math.min(w * 0.12, 120) * 0.55 };
+      // calm loop around a point, always moving
+      const orbit = (c, r) => ({ x: c.x + Math.cos(t * 0.55) * r, y: c.y + Math.sin(t * 0.55) * r * 0.35 + Math.sin(t * 1.3) * 3 });
+      const lerp = (a, b, k) => { const e = k * k * (3 - 2 * k); return { x: a.x + (b.x - a.x) * e, y: a.y + (b.y - a.y) * e - Math.sin(Math.PI * k) * 40 }; };
+      const flap = Math.sin(t * 7);
+      let pos = null, leaf = false;
+      if (phase === 1) {
+        // first dove: no rest, near the ark (8:9)
+        const p = (Math.sin(t * 0.4) + 1) / 2;
+        pos = { x: ark.x - 24 - p * 170, y: top + 22 + Math.sin(t * 2) * 10 };
+      } else if (phase === 2) {
+        // second dove: out to the olive tree, back to the ark at evening with the leaf (8:11)
+        const a = orbit(home, 34), b = orbit(tree, 30);
+        if (q < 0.45) pos = lerp(a, b, q / 0.45);
+        else if (q < 0.55) { pos = b; leaf = q > 0.5; }
+        else { pos = lerp(b, a, Math.min(1, (q - 0.55) / 0.45)); leaf = true; }
+      } else if (phase === 3) {
+        // third dove: sent to the olive tree and stays, circling it (8:12)
+        pos = lerp(orbit(home, 34), orbit(tree, 30), q);
+      } else if (phase === 4) {
+        // everyone leaves the ark: the dove circles near the rainbow
+        pos = lerp(orbit(tree, 30), orbit(bowC, 46), clamp(el / 12000, 0, 1));
+      }
+      if (pos) bird(ctx, pos.x, pos.y, "#f7f4ee", phase === 1 ? 1.35 : 1.1, flap, leaf);
+    }
+    const doveState = { phase: -1, t0: 0 };
+    function bird(ctx, x, y, color, s, wing, leaf) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(1.7, 1.7);
+      ctx.fillStyle = color;
+      ctx.strokeStyle = "rgba(40,32,24,0.85)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 7 * s, 3.2 * s, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-2, 0);
+      ctx.quadraticCurveTo(-12, -10 * wing, -18, 2);
+      ctx.quadraticCurveTo(-8, 1, -2, 1);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(2, 0);
+      ctx.quadraticCurveTo(10, -12 * wing, 16, 1);
+      ctx.quadraticCurveTo(8, 2, 2, 1);
+      ctx.fill();
+      if (leaf) {
+        ctx.strokeStyle = "#3d7a3a";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(8, 0);
+        ctx.lineTo(16, 3);
+        ctx.stroke();
+        ctx.fillStyle = "#6ea84a";
+        ctx.beginPath();
+        ctx.ellipse(17, 2, 4, 2.2, 0.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawBeast(ctx, x, y, type, phase, facing = 1) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(1.6 * facing, 1.6);
+      const step = Math.sin(phase);
+      const bob = Math.abs(Math.sin(phase)) * 0.8;
+      ctx.translate(0, -bob);
+      ctx.lineCap = "round"; ctx.lineJoin = "round";
+      const legs = (xs, top, col) => {
+        ctx.strokeStyle = col; ctx.lineWidth = 2;
+        xs.forEach((a, k) => { ctx.beginPath(); ctx.moveTo(a, top); ctx.lineTo(a + (k % 2 ? -step : step) * 2, bob); ctx.stroke(); });
+      };
+      const eye = (ex, ey) => { ctx.fillStyle = "#1a1410"; ctx.beginPath(); ctx.arc(ex, ey, 0.9, 0, 7); ctx.fill(); };
+      const person = (robe, sash, hair, beard, scarf, tall) => {
+        const H = tall;
+        legs([-2, 2], -6, "#4a3424");
+        ctx.fillStyle = robe;
+        ctx.beginPath(); ctx.moveTo(-5, -4); ctx.lineTo(-3.5, -H + 6); ctx.quadraticCurveTo(0, -H + 4, 3.5, -H + 6); ctx.lineTo(5, -4); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = sash; ctx.fillRect(-4.3, -H * 0.55, 8.6, 1.8);
+        ctx.fillStyle = "#e8c4a0"; ctx.beginPath(); ctx.arc(0, -H + 1, 3.6, 0, 7); ctx.fill();
+        if (scarf) { ctx.fillStyle = scarf; ctx.beginPath(); ctx.arc(0, -H + 0.5, 4.4, Math.PI * 0.95, Math.PI * 2.05); ctx.lineTo(4.4, -H + 6); ctx.lineTo(-4.4, -H + 6); ctx.fill(); }
+        else { ctx.fillStyle = hair; ctx.beginPath(); ctx.arc(0, -H, 3.8, Math.PI, 0); ctx.fill(); }
+        if (beard) { ctx.fillStyle = beard; ctx.beginPath(); ctx.moveTo(-2.8, -H + 2); ctx.quadraticCurveTo(0, -H + 9, 2.8, -H + 2); ctx.fill(); }
+        eye(1.6, -H + 0.6);
+      };
+      if (type === "noah") {
+        person("#3c5a8a", "#e2b15a", "#eee", "#f1efe8", null, 27);
+        ctx.strokeStyle = "#7a5634"; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(6, 0); ctx.lineTo(7, -27); ctx.stroke();
+      } else if (type === "wife") person("#8a3c52", "#f0d9a0", "#3a2a1c", null, "#d9b77a", 24);
+      else if (type === "son") person("#5d7a3c", "#c79a52", "#3a2a1c", "#4a3424", null, 25);
+      else if (type === "sheep") {
+        legs([-4, -1, 2, 4], -6, "#4a3a30");
+        ctx.fillStyle = "#fbf8f2";
+        for (const [dx, dy, r] of [[-5, -10, 4], [-1, -12, 4.5], [3, -10, 4], [-2, -8, 4], [1, -8, 4]]) { ctx.beginPath(); ctx.arc(dx, dy, r, 0, 7); ctx.fill(); }
+        ctx.fillStyle = "#4b3a30"; ctx.beginPath(); ctx.ellipse(7.5, -11, 2.6, 3.4, 0.3, 0, 7); ctx.fill();
+        ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(8.3, -11.6, 0.8, 0, 7); ctx.fill();
+      } else if (type === "cow") {
+        legs([-7, -4, 4, 7], -8, "#5a3a26");
+        ctx.fillStyle = "#a8714a"; ctx.beginPath(); ctx.ellipse(0, -13, 11, 6.5, 0, 0, 7); ctx.fill();
+        ctx.fillStyle = "#f3e9da"; ctx.beginPath(); ctx.ellipse(-3, -14, 3.5, 2.5, 0.4, 0, 7); ctx.fill();
+        ctx.fillStyle = "#a8714a"; ctx.beginPath(); ctx.ellipse(12, -16, 4, 3.4, 0.2, 0, 7); ctx.fill();
+        ctx.fillStyle = "#f0c0a8"; ctx.beginPath(); ctx.ellipse(15, -15, 2, 1.8, 0, 0, 7); ctx.fill();
+        ctx.strokeStyle = "#efe6d2"; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(10, -19); ctx.quadraticCurveTo(9, -22, 11, -23); ctx.moveTo(13, -19.5); ctx.quadraticCurveTo(14, -22.5, 16, -22); ctx.stroke();
+        eye(12.5, -17);
+        ctx.strokeStyle = "#7a4e32"; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(-11, -14); ctx.quadraticCurveTo(-14, -10, -13, -7); ctx.stroke();
+      } else if (type === "camel") {
+        legs([-6, -3, 4, 7], -11, "#9c7a4e");
+        ctx.fillStyle = "#c9a46c";
+        ctx.beginPath(); ctx.moveTo(-9, -11); ctx.quadraticCurveTo(-6, -24, -1, -14); ctx.quadraticCurveTo(3, -22, 8, -11); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(6, -13); ctx.quadraticCurveTo(12, -16, 11, -24); ctx.lineTo(14, -25); ctx.lineTo(16, -23); ctx.lineTo(13, -22); ctx.quadraticCurveTo(13, -14, 8, -11); ctx.fill();
+        eye(13, -24);
+      } else if (type === "dove") {
+        ctx.fillStyle = "#f4f1ea";
+        ctx.beginPath(); ctx.ellipse(0, -18 + Math.sin(phase * 2) * 2, 4, 2.4, 0, 0, 7); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(-1, -18); ctx.quadraticCurveTo(-4, -24 - step * 3, -7, -18); ctx.fill();
+      } else {
+        legs([-3, 3], -6, "#5c534c");
+        ctx.fillStyle = "#8d8478"; ctx.beginPath(); ctx.ellipse(-1, -9, 7, 4.5, 0, 0, 7); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function along(path, t) {
+      const n = path.length - 1;
+      const seg = clamp(t, 0, 1) * n;
+      const i = Math.min(n - 1, Math.floor(seg));
+      const f = seg - i;
+      return {
+        x: path[i].x + (path[i + 1].x - path[i].x) * f,
+        y: path[i].y + (path[i + 1].y - path[i].y) * f
+      };
+    }
+    function araratLeft(w, yOf, t) {
+      const cx = 0.74 * w;
+      const half = 0.2 * w;
+      const flat = Math.max(54, half * 0.22);
+      const peakY = yOf(PEAK);
+      const baseY = yOf(0);
+      const p0 = { x: cx - half, y: baseY };
+      const p1 = { x: cx - flat, y: peakY };
+      const c = { x: cx - half * 0.35, y: peakY + (baseY - peakY) * 0.45 };
+      const u = 1 - t;
+      return {
+        x: u * u * p0.x + 2 * u * t * c.x + t * t * p1.x,
+        y: u * u * p0.y + 2 * u * t * c.y + t * t * p1.y
+      };
+    }
+    function drawComing(ctx, ark, day, ts) {
+      if (day > -0.6) return;
+      const doorX = ark.x - ark.s * 0.7;
+      const doorY = ark.keel;
+      const kinds = ["noah", "wife", "son", "son", "sheep", "sheep", "cow", "camel", "dove"];
+      kinds.forEach((kind, i) => {
+        const p = ((ts / 1000) * 0.07 + i / kinds.length) % 1;
+        const x = doorX - 24 - (1 - p) * 260;
+        drawBeast(ctx, x, doorY, kind, ts / 160 + i);
+      });
+    }
+    let paradeStart = 0;
+    function drawLeaving(ctx, ark, w, yOf, day, ts) {
+      if (day < 360) { paradeStart = 0; return; }
+      if (!paradeStart) paradeStart = ts;
+      const ground = yOf(0);
+      const door = { x: ark.x - ark.s * 0.95, y: ark.keel - 1 };
+      const altarX = w * 0.42;
+      const progress = clamp((ts - paradeStart) / 6200, 0, 1);
+      if (progress > 0.35) drawAltar(ctx, altarX, ground - 1, ts);   // 8:20
+      const kinds = ["noah", "wife", "son", "son", "sheep", "cow", "camel", "sheep"];
+      kinds.forEach((kind, i) => {
+        const t = clamp((progress - i * 0.06) / 0.58, 0, 1);
+        if (t <= 0) return;
+        // walk down Ararat's left slope, then stand in a row left of the altar, facing it
+        const spot = { x: altarX - 34 - i * 30, y: ground - 1 };
+        const path = [door, araratLeft(w, yOf, 0.82), araratLeft(w, yOf, 0.5), araratLeft(w, yOf, 0.12), spot];
+        const p = along(path, t);
+        const facing = t >= 1 ? 1 : (along(path, Math.min(1, t + 0.01)).x >= p.x ? 1 : -1);
+        drawBeast(ctx, p.x, p.y, kind, t >= 1 ? 0 : ts / 150 + i, facing);
+      });
+      if (progress > 0.45) drawRainbow(ctx, w, yOf, clamp((progress - 0.45) / 0.3, 0, 1));
+    }
+    function drawRainbow(ctx, w, yOf, alpha) {
+      const colors = ["#c0392b", "#e67e22", "#f1c40f", "#27ae60", "#2980b9", "#6c3483"];
+      const cx = w * 0.34;
+      const radius = Math.min(w * 0.12, 120);
+      const cy = yOf(0.58 * HS) - 30;
+      ctx.save();
+      ctx.globalAlpha = 0.82 * alpha;
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      cloud(ctx, cx - radius * 0.86, cy - radius * 0.18, 30);
+      cloud(ctx, cx + radius * 0.86, cy - radius * 0.16, 34);
+      ctx.lineWidth = 5;
+      colors.forEach((c, i) => {
+        ctx.strokeStyle = c;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius - i * 7, Math.PI * 1.05, Math.PI * 1.95);
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+    function drawAltar(ctx, x, y, ts) {
+      ctx.fillStyle = "#d9d3c7";
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 3 - (r > 1 ? 1 : 0); c++) {
+        ctx.fillRect(x - 17 + c * 12 + (r > 1 ? 6 : 0), y - 9 - r * 8, 11, 7);
+      }
+      ctx.fillStyle = "#e08a3a";
+      ctx.beginPath(); ctx.moveTo(x - 8, y - 25); ctx.quadraticCurveTo(x, y - 40 - Math.sin(ts / 160) * 4, x + 8, y - 25); ctx.fill();
+      ctx.fillStyle = "#f6e2b4"; ctx.font = "700 13px Assistant, sans-serif"; ctx.textAlign = "center"; ctx.direction = "rtl";
+      ctx.fillText("מזבח", x, y + 14);
+      ctx.strokeStyle = `rgba(230,230,230,${0.45 + Math.sin(ts / 200) * 0.2})`;
+      ctx.beginPath();
+      ctx.moveTo(x, y - 36);
+      ctx.quadraticCurveTo(x + 10, y - 56, x - 2, y - 74);
+      ctx.stroke();
+    }
+    function drawAxis(ctx, w, h, yOf, level) {
+      ctx.save();
+      const x = w - 36;
+      ctx.strokeStyle = "rgba(255,248,230,0.8)";
+      ctx.fillStyle = "#fff8ea";
+      ctx.lineWidth = 1.5;
+      ctx.font = "700 12px Assistant, Segoe UI, sans-serif";
+      ctx.textAlign = "right";
+      ctx.direction = "ltr";
+      ctx.beginPath();
+      ctx.moveTo(x, yOf(1));
+      ctx.lineTo(x, yOf(PEAK));
+      ctx.stroke();
+      for (const cubit of [0, 15]) {
+        const y = yOf(PEAK + (cubit / 15) * (1 - PEAK));
+        ctx.beginPath();
+        ctx.moveTo(x - 6, y);
+        ctx.lineTo(x + 6, y);
+        ctx.stroke();
+        ctx.fillText(String(cubit), x - 10, y + 4);
+      }
+      ctx.font = "700 11px Assistant, Segoe UI, sans-serif";
+      ctx.fillText("אמות", x, yOf(1) - 8);
+      const now = cubitsAbove(level);
+      ctx.restore();
+      const meter = document.getElementById("meter");
+      let meterText;
+      const cub = Math.round(Math.abs(now));
+      if (simDay < 0) meterText = simDay < -6.5 ? "לפני המבול" : "המים מתחילים לעלות";
+      else if (simDay >= 360) meterText = "כ״ז במרחשוון: יוצאים מן התיבה";
+      else if (simDay >= 308) meterText = "חרבו המים";
+      else if (now >= 0.05) meterText = `המים: ${hebNum(cub) || "פחות מאמה"}${cub ? " אמות" : ""} מעל ראשי ההרים`;
+      else if (simDay < 16) meterText = "המים עולים";
+      else if (simDay < 40) meterText = "המים עולים";
+      else if (simDay < 190) meterText = "המים בקו ראשי ההרים";
+      else if (simDay < 252) meterText = "נראו ראשי ההרים";
+      else meterText = `המים יורדים: ${Math.round(levelOf(simDay) / PEAK * 100)}% מגובה ההרים`;
+      if (meter.dataset.text !== meterText) {
+        meter.dataset.text = meterText;
+        meter.innerHTML = meterText;
+      }
+    }
+
+    function drawGraph() {
+      if (document.getElementById("graphPanel").hidden) return;
+      const { ctx, w, h } = fit(graphEl);
+      if (h < 2) return;
+      ctx.clearRect(0, 0, w, h);
+      const padL = 8, padR = 8, top = 16, bot = 22;
+      const xOf = (day) => {
+        const t = (day - MIN_DAY) / (MAX_DAY - MIN_DAY);
+        return w - padR - t * (w - padL - padR);
+      };
+      ctx.beginPath();
+      for (let d = MIN_DAY; d <= MAX_DAY; d += 2) {
+        const x = xOf(d);
+        const y = top + (1 - levelOf(d)) * (h - top - bot);
+        if (d === MIN_DAY) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.lineTo(xOf(MAX_DAY), h - bot);
+      ctx.lineTo(xOf(MIN_DAY), h - bot);
+      ctx.closePath();
+      const fill = ctx.createLinearGradient(0, top, 0, h);
+      fill.addColorStop(0, "rgba(120,196,214,0.85)");
+      fill.addColorStop(1, "rgba(14,70,100,0.9)");
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.8)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let d = MIN_DAY; d <= MAX_DAY; d += 2) {
+        const x = xOf(d);
+        const y = top + (1 - levelOf(d)) * (h - top - bot);
+        if (d === MIN_DAY) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      const idx = stageIndex(simDay);
+      STAGES.forEach((s, i) => {
+        const x = xOf(s.day);
+        const y = top + (1 - levelOf(s.day)) * (h - top - bot);
+        ctx.beginPath();
+        ctx.arc(x, y, i === idx ? 6 : 4, 0, Math.PI * 2);
+        ctx.fillStyle = i === idx ? "#e2b15a" : "#f7f1e4";
+        ctx.fill();
+        ctx.strokeStyle = "#1b3344";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+      const cx = xOf(simDay);
+      ctx.strokeStyle = "rgba(226,177,90,0.95)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, 4);
+      ctx.lineTo(cx, h - 4);
+      ctx.stroke();
+      const yL = (lv) => top + (1 - lv) * (h - top - bot);
+      ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = "rgba(226,177,90,0.8)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(padL, yL(PEAK)); ctx.lineTo(w - padR, yL(PEAK)); ctx.stroke(); ctx.restore();
+      ctx.font = "600 10px Assistant, Segoe UI, sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = "rgba(247,241,228,0.75)";
+      for (const [d, lab] of [[0, "י״ז מרחשוון"], [40, "כ״ח כסלו"], [190, "א׳ סיון"], [206, "י״ז סיון"], [249, "א׳ אב"], [308, "א׳ תשרי"]]) {
+        const x = xOf(d);
+        ctx.fillRect(x - 0.5, h - bot, 1, 4);
+        ctx.fillText(lab, x, h - bot + 13);
+      }
+      ctx.textAlign = "left"; ctx.fillStyle = "#f6e2b4";
+      ctx.fillText("ראשי ההרים", padL + 2, yL(PEAK) + 10);
+      ctx.fillText("15 אמות מעל", padL + 2, yL(1) - 2);
+      ctx.direction = "rtl";
+      ctx.fillStyle = "rgba(247,241,228,0.8)";
+      ctx.font = "700 12px Assistant, Segoe UI, sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText("גובה המים לפי הימים · תאריכים לפי רש״י", w - 8, 12);
+      ctx.textAlign = "left";
+      ctx.textAlign = "right";
+      graphEl._xOf = xOf;
+      graphEl._w = w;
+    }
+
+    let shownStage = -1, textStage = -1, fadeTimer = 0;
+    function renderText() {
+      let idx = stageIndex(simDay);
+      if (textStage === -1) textStage = idx;
+      if (idx !== textStage && !fadeTimer) {
+        const box = document.querySelector(".verse");
+        box.classList.add("fade");
+        fadeTimer = setTimeout(() => { textStage = stageIndex(simDay); box.classList.remove("fade"); fadeTimer = 0; }, 380);
+      }
+      idx = textStage;
+      const s = STAGES[idx];
+      document.getElementById("dateLabel").textContent = dateOf(simDay);
+      document.getElementById("yearLabel").textContent = simDay >= 308 ? "שנת שש מאות ואחת לנח" : "שנת שש מאות לנח";
+      document.getElementById("kicker").innerHTML = `${s.date || dateOf(s.day)}<b>${s.title}</b>`;
+      document.getElementById("verse").textContent = s.verse;
+      document.getElementById("note").innerHTML = `<cite>${s.ref}</cite> · <b class="bib">${s.bib}</b> · ${s.note}`;
+      const play = document.getElementById("play");
+      play.textContent = mode === "play" ? "❚❚ הפסק" : "▶ הפעל";
+      [...chipsEl.children].forEach((btn, i) => btn.classList.toggle("active", i === idx));
+      const active = chipsEl.children[idx];
+      
+      shownStage = idx;
+      STAGES[idx].date = dateOf(s.day);
+    }
+
+    function seek(day) {
+      seekFrom = simDay;
+      seekTo = clamp(day, MIN_DAY, MAX_DAY);
+      seekT0 = performance.now();
+      mode = "seek";
+      holdUntil = 0;
+    }
+    function goStage(i) { seek(STAGES[clamp(i, 0, STAGES.length - 1)].day); }
+    function togglePlay() {
+      if (mode === "play") { mode = "idle"; return; }
+      if (simDay >= MAX_DAY - 0.5) simDay = MIN_DAY;
+      mode = "play";
+      holdUntil = performance.now() + 400;
+    }
+
+    STAGES.forEach((s, i) => {
+      s.date = dateOf(s.day);
+      const b = document.createElement("button");
+      b.type = "button";
+      b.innerHTML = `<small>${s.date}</small>${s.title}`;
+      b.addEventListener("click", () => goStage(i));
+      chipsEl.appendChild(b);
+    });
+    document.getElementById("play").addEventListener("click", togglePlay);
+    document.getElementById("graphTab").addEventListener("click", () => {
+      const panel = document.getElementById("graphPanel");
+      const tab = document.getElementById("graphTab");
+      panel.hidden = !panel.hidden;
+      tab.classList.toggle("open", !panel.hidden);
+      tab.textContent = panel.hidden ? "גרף המים" : "הסתר גרף";
+    });
+    document.getElementById("full").addEventListener("click", () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    });
+    graphEl.addEventListener("click", (ev) => {
+      const rect = graphEl.getBoundingClientRect();
+      const x = ev.clientX - rect.left;
+      const t = (graphEl._w - 8 - x) / (graphEl._w - 16);
+      seek(MIN_DAY + clamp(t, 0, 1) * (MAX_DAY - MIN_DAY));
+    });
+    window.addEventListener("keydown", (ev) => {
+      if (ev.key === "ArrowLeft") goStage(stageIndex(simDay) + 1);
+      if (ev.key === "ArrowRight") goStage(stageIndex(simDay) - 1);
+      if (ev.key === " ") { ev.preventDefault(); togglePlay(); }
+    });
+
+    function frame(ts) {
+      const dt = lastTs ? Math.min(0.05, (ts - lastTs) / 1000) : 0;
+      lastTs = ts;
+      clock = ts;
+      if (mode === "seek") {
+        const t = clamp((ts - seekT0) / 1500, 0, 1);
+        const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        simDay = seekFrom + (seekTo - seekFrom) * e;
+        if (t >= 1) { simDay = seekTo; mode = "idle"; }
+      } else if (mode === "play") {
+        if (ts >= holdUntil) {
+          const prev = simDay;
+          simDay += dt * 11;
+          for (const s of STAGES) {
+            if (prev < s.day && simDay >= s.day) {
+              simDay = s.day;
+              holdUntil = ts + 4200;
+              break;
+            }
+          }
+          if (simDay >= MAX_DAY) { simDay = MAX_DAY; mode = "idle"; }
+        }
+      }
+      drawScene(ts);
+      drawGraph();
+      renderText();
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
